@@ -36,7 +36,7 @@ export default class Queue<T> implements QueueType<T> {
         Either we initialize the queue
         Or we have at least one element
       */
-        const newNode = { value: item };
+        const newNode = { value: item } as Node<T>;
         this.length++;
         if (!this.head || !this.tail) {
             this.head = this.tail = newNode;
@@ -44,7 +44,6 @@ export default class Queue<T> implements QueueType<T> {
         }
         this.tail.next = newNode;
         this.tail = this.tail?.next;
-        return;
     }
     deque(): T | undefined {
         /*
