@@ -42,7 +42,7 @@ declare interface List<T> {
 }
 
 export default class SinglyLinkedList<T> implements List<T> {
-    head: ListNode<T> | undefined;
+    private head: ListNode<T> | undefined;
     length: number;
 
     constructor() {
