@@ -26,11 +26,13 @@ export default class RingBuffer<T> implements BufferType<T> {
     private tail: number;
     private capacity: number;
     private list: T[];
+    private length: number;
 
     constructor(capacity = 1) {
         this.capacity = capacity;
         this.list = [];
         this.head = this.tail = Math.floor(this.list.length / 2);
+        this.length = 0;
     }
 
     private getModulusIndex(index: number) {
@@ -61,30 +63,28 @@ export default class RingBuffer<T> implements BufferType<T> {
          * We push by the TAIL
          * Cases:
          * 1. First item pushed
+         * 3. Item pushed but no more room, so we got to resize
          * 2. Item pushed but still room in t
-         * 3. Item pushed but no more room, so we got to %
-         * 4. Item pushed but we need to resize
          */
-        if (this.list.filter((item) => item).length === 0) {
+        if (this.length === 0) {
             this.list[this.tail] = item;
+            this.length++;
             return;
         }
-        if (this.list.filter((item) => item).length === this.capacity)
-            this.resize();
+
+        if (this.length === this.capacity) this.resize();
         else this.tail = this.getModulusIndex(this.tail + 1);
         this.list[this.tail] = item;
+        this.length++;
     }
     pop(): T | undefined {
         /*
          * We pop by the HEAD
-         * Cases:
-         * 1. We only have one item, to pop (head and tail match)
-         * 2. Item pushed but still room in t
-         * 3. Item pushed but no more room, so we got to %
-         * 4. Item pushed but we need to resize
+         * and we only move it when it's different from the tail (meaning there is something to delete)
          */
         const value = this.list[this.head];
         this.list[this.head] = undefined as any as T;
+        this.length = this.length > 0 ? this.length - 1 : this.length;
         if (this.head !== this.tail) {
             this.head = this.getModulusIndex(this.head + 1);
         }
